@@ -15,7 +15,10 @@ namespace SolitaireTest
 
         public MoveResult RecordMove(CardStack source, CardStack target, int splitIndex)
         {
-            if (!_stacks.Contains(source) || !_stacks.Contains(target))
+            var sourceIdx = _stacks.IndexOf(source);
+            var targetIdx = _stacks.IndexOf(target);
+            
+            if (sourceIdx == -1 || targetIdx == -1)
                 return null;
 
             var sourceBefore = source.Clone();
@@ -25,6 +28,8 @@ namespace SolitaireTest
                 return null;
 
             var result = new MoveResult(
+                sourceIdx,
+                targetIdx,
                 sourceBefore,
                 source.Clone(),
                 targetBefore,
@@ -46,24 +51,23 @@ namespace SolitaireTest
             if (last == null) return null;
 
             // Revert both stacks by clearing and restoring from "before" snapshots
-            if (last.SourceBefore is CardStack srcStack && last.TargetBefore is CardStack tgtStack)
-            {
-                srcStack._cards.Clear();
-                srcStack._cards.AddRange(((CardStack)last.SourceBefore)._cards);
+            var srcStack = _stacks[last.SourceIdx];
+            var tgtStack = _stacks[last.TargetIdx];
+            srcStack._cards.Clear();
+            srcStack._cards.AddRange(((CardStack)last.SourceBefore)._cards);
 
-                tgtStack._cards.Clear();
-                tgtStack._cards.AddRange(((CardStack)last.TargetBefore)._cards);
+            tgtStack._cards.Clear();
+            tgtStack._cards.AddRange(((CardStack)last.TargetBefore)._cards);
 
-                return new MoveResult(
-                    last.SourceAfter,
-                    last.SourceBefore,
-                    last.TargetAfter,
-                    last.TargetBefore,
-                    last.MovedCards
-                );
-            }
-
-            return null;
+            return new MoveResult(
+                last.TargetIdx,
+                last.SourceIdx,
+                last.TargetAfter,
+                last.TargetBefore,
+                last.SourceAfter,
+                last.SourceBefore,
+                last.MovedCards
+            );
         }
     }
 }
