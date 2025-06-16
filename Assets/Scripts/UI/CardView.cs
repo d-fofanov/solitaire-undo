@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace SolitaireTest
@@ -13,6 +14,7 @@ namespace SolitaireTest
         
         private Card _card;
         private bool _isFaceUp = false;
+        private Action _onClick = null;
 
         private void Awake()
         {
@@ -22,11 +24,17 @@ namespace SolitaireTest
         /// <summary>
         /// Assigns the card and shows its front or back based on current state.
         /// </summary>
-        public void SetCard(Card card, bool faceUp = true)
+        public void Setup(Card card, bool faceUp = true, Action onClick = null)
         {
             _card = card;
             _isFaceUp = faceUp;
+            _onClick = onClick;
             UpdateVisual();
+        }
+
+        public void OnClick()
+        {
+            _onClick?.Invoke();
         }
 
         /// <summary>

@@ -15,10 +15,23 @@ namespace SolitaireTest
         private SolitaireGame _game;
         private CardPool _cardPool;
         private readonly List<CardStackView> _stackViews = new();
+        private (IReadOnlyCardStack stack, int index)? _pendingClick = null;
 
         public void UndoMove()
         {
             _game.UndoMove();
+        }
+
+        private void OnStackClicked(IReadOnlyCardStack stack, int cardIndex)
+        {
+            if (_pendingClick == null)
+            {
+                _pendingClick = (stack, cardIndex);
+                return;
+            }
+
+            _game.TryMakeMove(_pendingClick.Value.stack, stack, _pendingClick.Value.index);
+            _pendingClick = null;
         }
 
         private void Start()
@@ -54,7 +67,7 @@ namespace SolitaireTest
                 stackViewGO.transform.SetParent(anchor, worldPositionStays: false);
 
                 var stackView = stackViewGO.AddComponent<CardStackView>();
-                stackView.Bind(_game.Stacks[i], _cardPool);
+                stackView.Bind(_game.Stacks[i], _cardPool, OnStackClicked);
 
                 _stackViews.Add(stackView);
             }

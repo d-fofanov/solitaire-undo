@@ -68,6 +68,18 @@ namespace SolitaireTest
             var result = _history.RecordMove(source, target, splitIndex);
             return result != null;
         }
+        
+        public bool TryMakeMove(IReadOnlyCardStack sourceStack, IReadOnlyCardStack targetStack, int splitIndex)
+        {
+            var source = _stacks.FirstOrDefault(s => s == sourceStack);
+            var target = _stacks.FirstOrDefault(s => s == targetStack);
+
+            if (source == null || target == null)
+                return false;
+
+            var result = _history.RecordMove(source, target, splitIndex);
+            return result != null;
+        }
 
         /// <summary>
         /// Undoes the last move, if any.
